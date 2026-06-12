@@ -1,34 +1,39 @@
+default_language_version:
+    python: '>= 3.10'
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v6.0.0
     hooks:
       - id: end-of-file-fixer
+      - id: check-json
       - id: check-yaml
       - id: check-toml
 
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.1.0
+  - repo: https://github.com/tombi-toml/tombi-pre-commit
+    rev: v1.1.1
     hooks:
-      - id: ruff
+      - id: tombi-lint
+        args: ["--offline"]
+      - id: tombi-format
+        args: ["--offline"]
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.15.15
+    hooks:
+      - id: ruff-check
         args:
+          # https://github.com/astral-sh/ruff-pre-commit/issues/64
           - '--fix'
           - '--unsafe-fixes'
+      - id: ruff-format
 
-  - repo: https://github.com/psf/black
-    rev: 23.9.1
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.11.17
     hooks:
-      - id: black
+      - id: uv-lock
+      - id: uv-export
         args:
-          - '--skip-string-normalization'
-          - '--line-length'
-          - '120'
-
-  - repo: https://github.com/pdm-project/pdm
-    rev: 2.9.3
-    hooks:
-      - id: pdm-export
-        args:
-          - -o
+          - '-o'
           - 'requirements.txt'
-          - '--without-hashes'
-        files: ^pdm.lock$
+          - '--no-hashes'
