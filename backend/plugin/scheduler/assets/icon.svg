@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Scheduler">
+  <rect width="64" height="64" rx="18" fill="#0f766e"/>
+  <circle cx="32" cy="32" r="19" fill="none" stroke="#ccfbf1" stroke-width="5"/>
+  <path d="M32 19v14l10 6" fill="none" stroke="#fef3c7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M18 12l-5 5m33-5 5 5" fill="none" stroke="#99f6e4" stroke-width="4" stroke-linecap="round"/>
+</svg>

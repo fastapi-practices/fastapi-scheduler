@@ -1,11 +1,11 @@
 # FastAPI Scheduler
 
-基于 fba-slim 的 FastAPI 任务调度服务，已集成 APScheduler `4.0.0a6`
+基于 fba-slim 的 FastAPI 任务调度服务，通过 scheduler 插件集成 APScheduler `4.0.0a6`
 
 ## 特性
 
 - FastAPI 后端基础架构
-- APScheduler 随应用 lifespan 自动启停
+- APScheduler 由 `backend/plugin/scheduler` 插件随应用 lifespan 自动启停
 - PostgreSQL / MySQL 与 Redis 支持
 - uv 管理依赖
 - 保留 fba CLI、插件、迁移、日志能力
@@ -26,7 +26,7 @@ uv run fba run 127.0.0.1 8000
 
 ## 关键配置
 
-在 `backend/.env` 中配置数据库、Redis 和调度器：
+在 `backend/.env` 中配置数据库、Redis 和 Token：
 
 ```env
 DATABASE_TYPE='postgresql'
@@ -38,19 +38,17 @@ REDIS_HOST='127.0.0.1'
 REDIS_PORT=6379
 REDIS_PASSWORD=''
 REDIS_DATABASE=0
-SCHEDULER_ENABLED=true
-SCHEDULER_IDENTITY='fastapi-scheduler'
 TOKEN_SECRET_KEY='replace-with-your-secret'
 ```
 
 ## 调度器
 
-调度器入口：`backend/common/scheduler.py`
+调度器由 `backend/plugin/scheduler` 插件提供
 
 ```python
 from apscheduler.triggers.interval import IntervalTrigger
 
-from backend.common.scheduler import get_scheduler
+from backend.plugin.scheduler.service.scheduler_service import get_scheduler
 
 
 async def demo_job() -> None:

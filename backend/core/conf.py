@@ -55,7 +55,7 @@ class Settings(BaseSettings):
     # 数据库
     DATABASE_ECHO: bool | Literal['debug'] = False
     DATABASE_POOL_ECHO: bool | Literal['debug'] = False
-    DATABASE_SCHEMA: str = 'fba'
+    DATABASE_SCHEMA: str = 'fastapi_scheduler'
     DATABASE_CHARSET: str = 'utf8mb4'
     DATABASE_PK_MODE: Literal['autoincrement', 'snowflake'] = 'autoincrement'
 
@@ -147,7 +147,10 @@ class Settings(BaseSettings):
     DATETIME_TIMEZONE: str = 'Asia/Shanghai'
     DATETIME_FORMAT: str = '%Y-%m-%d %H:%M:%S'
 
-    # 调度器配置
+    ##################################################
+    # [ Plugin ] scheduler
+    ##################################################
+    # 基础配置（in plugin.toml）
     SCHEDULER_ENABLED: bool = True
     SCHEDULER_IDENTITY: str = 'fastapi-scheduler'
 

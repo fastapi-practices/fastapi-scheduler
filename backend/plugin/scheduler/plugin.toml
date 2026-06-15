@@ -1,0 +1,15 @@
+[plugin]
+icon = "assets/icon.svg"
+summary = "任务调度器"
+version = "0.0.1"
+description = "基于 APScheduler 提供应用生命周期内的异步调度器运行时"
+author = "fastapi-scheduler"
+tags = ["task"]
+database = ["mysql", "postgresql"]
+
+[app]
+router = ["v1"]
+
+[settings]
+SCHEDULER_ENABLED = true
+SCHEDULER_IDENTITY = "fastapi-scheduler"

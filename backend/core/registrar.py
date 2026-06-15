@@ -17,7 +17,6 @@ from backend.common.exception.exception_handler import register_exception
 from backend.common.lifespan import lifespan_manager
 from backend.common.log import set_custom_logfile, setup_logging
 from backend.common.response.response_code import StandardResponseCode
-from backend.common.scheduler import register_scheduler_lifespan
 from backend.core.conf import settings
 from backend.core.path_conf import STATIC_DIR, UPLOAD_DIR
 from backend.database.db import create_tables
@@ -73,8 +72,6 @@ async def register_init(app: FastAPI) -> AsyncGenerator[None, None]:
 
 def register_app() -> FastAPI:
     """注册 FastAPI 应用"""
-    register_scheduler_lifespan()
-
     app = FastAPI(
         title=settings.FASTAPI_TITLE,
         version=__version__,

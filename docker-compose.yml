@@ -57,7 +57,7 @@ services:
     container_name: fba_postgres
     restart: always
     environment:
-      POSTGRES_DB: fba
+      POSTGRES_DB: fastapi_scheduler
       POSTGRES_PASSWORD: 123456
       TZ: Asia/Shanghai
     volumes:
@@ -73,7 +73,7 @@ services:
 #    container_name: fba_mysql
 #    restart: always
 #    environment:
-#      MYSQL_DATABASE: fba
+#      MYSQL_DATABASE: fastapi_scheduler
 #      MYSQL_ROOT_PASSWORD: 123456
 #      TZ: Asia/Shanghai
 #    volumes:
