@@ -206,7 +206,7 @@ sqlalchemy-crud-plus==1.13.3
     # via fastapi-scheduler
 sqlparse==0.5.5
     # via fastapi-scheduler
-starlette==1.2.0
+starlette==1.3.1
     # via
     #   fastapi
     #   starlette-context
