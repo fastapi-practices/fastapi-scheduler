@@ -1,0 +1,204 @@
+html {
+  --sa-antdv-radius: 6px;
+}
+
+.ant-app {
+  min-height: 100%;
+  color: rgb(var(--base-text-color));
+  font-size: 14px;
+  background: transparent;
+}
+
+.ant-app .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+}
+
+.ant-app .ant-btn > span,
+.ant-app .ant-btn .ant-btn-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ant-app .ant-btn.ant-btn-text:not(:disabled):hover,
+.ant-app .ant-btn.ant-btn-text:not(:disabled):focus-visible {
+  color: rgb(var(--primary-color));
+  background: rgb(var(--primary-color) / 0.1);
+}
+
+.ant-app .ant-card {
+  color: rgb(var(--base-text-color));
+  background: rgb(var(--container-bg-color));
+}
+
+.ant-app .ant-card:not(.ant-card-bordered) {
+  border-color: transparent;
+}
+
+.ant-app .ant-card .ant-card-head {
+  color: rgb(var(--base-text-color));
+}
+
+.ant-app .ant-card-small > .ant-card-head {
+  min-height: 40px;
+  padding-inline: 16px;
+}
+
+.ant-app .ant-card-small > .ant-card-body {
+  padding: 12px;
+}
+
+.ant-app .ant-alert {
+  align-items: flex-start;
+}
+
+.ant-app .ant-alert-message,
+.ant-app .ant-alert-description,
+.ant-app .ant-divider,
+.ant-app .ant-divider-inner-text,
+.ant-app .ant-form,
+.ant-app .ant-menu,
+.ant-app .ant-dropdown-menu,
+.ant-app .ant-popover,
+.ant-app .ant-modal,
+.ant-app .ant-drawer,
+.ant-app .ant-select,
+.ant-app .ant-input,
+.ant-app .ant-input-affix-wrapper,
+.ant-app .ant-input-number,
+.ant-app .ant-checkbox-wrapper,
+.ant-app .ant-segmented,
+.ant-app .ant-table-wrapper {
+  font-size: 14px;
+}
+
+.ant-divider,
+.ant-dropdown-menu,
+.ant-select-dropdown,
+.ant-popover,
+.ant-modal,
+.ant-drawer,
+.ant-message,
+.ant-notification {
+  font-size: 14px;
+}
+
+.ant-divider,
+.ant-divider-inner-text {
+  font-size: 14px !important;
+}
+
+.ant-app .ant-btn-lg,
+.ant-app .ant-input-lg,
+.ant-app .ant-input-affix-wrapper-lg {
+  font-size: 15px;
+}
+
+.ant-app .ant-form-item {
+  margin-bottom: 24px;
+}
+
+.ant-app .ant-form-item:last-child {
+  margin-bottom: 0;
+}
+
+.ant-app .ant-input,
+.ant-app .ant-input-affix-wrapper,
+.ant-app .ant-input-number,
+.ant-app .ant-select-selector {
+  color: rgb(var(--base-text-color));
+  background: rgb(var(--container-bg-color));
+}
+
+.ant-app .ant-input-password .ant-input {
+  background: transparent;
+}
+
+.ant-app .ant-breadcrumb,
+.ant-app .ant-breadcrumb a,
+.ant-app .ant-statistic,
+.ant-app .ant-statistic-content,
+.ant-app .ant-statistic-title {
+  color: inherit;
+}
+
+.ant-app .ant-dropdown-menu,
+.ant-app .ant-select-dropdown,
+.ant-app .ant-popover-inner,
+.ant-app .ant-modal-content,
+.ant-app .ant-modal-container,
+.ant-app .ant-modal-body,
+.ant-app .ant-modal-footer,
+.ant-app .ant-drawer-content {
+  color: rgb(var(--base-text-color));
+  background: rgb(var(--container-bg-color));
+}
+
+.ant-dropdown-menu,
+.ant-select-dropdown,
+.ant-popover-inner,
+.ant-modal-content,
+.ant-modal-container,
+.ant-modal-body,
+.ant-modal-footer,
+.ant-drawer-content,
+.ant-drawer-section,
+.ant-drawer-header,
+.ant-drawer-body,
+.ant-drawer-footer,
+.ant-message-notice-content,
+.ant-notification-notice {
+  color: rgb(var(--base-text-color));
+  background: rgb(var(--container-bg-color));
+}
+
+.ant-app .ant-menu {
+  border-inline-end: 0;
+}
+
+.ant-app .ant-menu-light,
+.ant-app .ant-menu-light > .ant-menu {
+  color: rgb(var(--base-text-color));
+  background: transparent;
+}
+
+.ant-app .ant-menu-inline,
+.ant-app .ant-menu-vertical {
+  border-inline-end: 0 !important;
+}
+
+.ant-app .ant-segmented-item-label {
+  min-height: 28px;
+  line-height: 28px;
+}
+
+.ant-app .ant-table-wrapper .ant-table,
+.ant-app .ant-table-wrapper .ant-table-thead > tr > th,
+.ant-app .ant-table-wrapper .ant-table-tbody > tr > td {
+  color: rgb(var(--base-text-color));
+}
+
+.ant-app .ant-watermark {
+  min-height: 100%;
+}
+
+.sa-login-action-space,
+.sa-login-action-space > .ant-space-item {
+  width: 100%;
+}
+
+.sa-login-action-space > .ant-space-item > * {
+  width: 100%;
+}
+
+.ant-app .ant-divider,
+.ant-divider {
+  border-block-start-color: rgb(var(--base-text-color) / 0.12);
+}
+
+.ant-app .ant-divider-with-text .ant-divider-rail,
+.ant-divider-with-text .ant-divider-rail {
+  border-block-start: 1px solid rgb(var(--base-text-color) / 0.12) !important;
+}

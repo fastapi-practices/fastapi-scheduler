@@ -16,4 +16,3 @@ superpowers/
 .codegraph/
 frontend/node_modules/
 frontend/dist/
-frontend/.env

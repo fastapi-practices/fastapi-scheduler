@@ -131,7 +131,7 @@ class Settings(BaseSettings):
     # CORS
     CORS_ALLOWED_ORIGINS: list[str] = [  # 末尾不带斜杠
         'http://127.0.0.1',
-        'http://localhost:5173',
+        'http://localhost:9527',
     ]
     CORS_EXPOSE_HEADERS: list[str] = [
         'X-Request-ID',
