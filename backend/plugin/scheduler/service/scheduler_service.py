@@ -6,7 +6,16 @@ from uuid import UUID
 
 import sqlalchemy as sa
 
-from apscheduler import AsyncScheduler, Job, Schedule, ScheduleLookupError
+from apscheduler import (
+    AsyncScheduler,
+    CoalescePolicy,
+    ConflictPolicy,
+    ConflictingIdError,
+    Job,
+    Schedule,
+    ScheduleLookupError,
+    TaskLookupError,
+)
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
@@ -16,6 +25,7 @@ from backend.common.exception import errors
 from backend.common.pagination import paging_data
 from backend.core.conf import settings
 from backend.plugin.scheduler.schema.scheduler import (
+    CreateSchedulerJobParam,
     GetSchedulerJobDetail,
     GetSchedulerRunDetail,
     GetSchedulerStatusDetail,
@@ -92,6 +102,41 @@ class SchedulerService:
         running_counts = _get_running_job_counts(jobs)
         return _to_job_detail(schedule, running_counts)
 
+    async def create(self, *, obj: CreateSchedulerJobParam) -> GetSchedulerJobDetail:
+        """
+        创建调度任务
+
+        :param obj: 创建调度任务参数
+        :return:
+        """
+        _ensure_scheduler_operable()
+        trigger = _build_trigger(trigger_type=obj.trigger_type, trigger_config=obj.trigger_config)
+        add_schedule_kwargs: dict[str, Any] = {
+            'id': obj.id,
+            'args': obj.args,
+            'kwargs': obj.kwargs,
+            'paused': obj.paused,
+            'coalesce': CoalescePolicy[obj.coalesce],
+            'max_jitter': obj.max_jitter,
+            'job_result_expiration_time': obj.job_result_expiration_time,
+            'conflict_policy': ConflictPolicy[obj.conflict_policy],
+        }
+        if obj.job_executor is not None:
+            add_schedule_kwargs['job_executor'] = obj.job_executor
+        if obj.misfire_grace_time is not None:
+            add_schedule_kwargs['misfire_grace_time'] = obj.misfire_grace_time
+        if obj.metadata:
+            add_schedule_kwargs['metadata'] = obj.metadata
+        try:
+            schedule_id = await scheduler_manager.scheduler.add_schedule(obj.task_id, trigger, **add_schedule_kwargs)
+        except ConflictingIdError as exc:
+            raise errors.ConflictError(msg='调度任务已存在') from exc
+        except TaskLookupError as exc:
+            raise errors.NotFoundError(msg='APScheduler 任务不存在') from exc
+        except (TypeError, ValueError) as exc:
+            raise errors.RequestError(msg=f'调度任务参数错误: {exc}') from exc
+        return await self.get(schedule_id=schedule_id)
+
     async def pause(self, *, schedule_id: str) -> GetSchedulerJobDetail:
         """
         暂停调度任务
@@ -148,6 +193,22 @@ class SchedulerService:
         await scheduler_manager.scheduler.remove_schedule(schedule_id)
 
     @staticmethod
+    async def delete_jobs(*, schedule_ids: list[str]) -> int:
+        """
+        批量删除调度任务
+
+        :param schedule_ids: 任务 ID 列表
+        :return:
+        """
+        _ensure_scheduler_operable()
+        schedule_ids = list(dict.fromkeys(schedule_ids))
+        for schedule_id in schedule_ids:
+            await _get_schedule(schedule_id=schedule_id)
+        for schedule_id in schedule_ids:
+            await scheduler_manager.scheduler.remove_schedule(schedule_id)
+        return len(schedule_ids)
+
+    @staticmethod
     async def get_list(*, db: AsyncSession, schedule_id: str | None = None) -> dict[str, Any]:
         """
         获取调度任务运行记录
@@ -160,8 +221,34 @@ class SchedulerService:
         run_record_select = _get_run_records_select(records)
         return await paging_data(db, run_record_select, transformer=_serialize_run_record_rows)
 
+    @staticmethod
+    def delete_runs(*, job_ids: list[str]) -> int:
+        """
+        批量删除调度任务运行记录
+
+        :param job_ids: 运行任务 ID 列表
+        :return:
+        """
+        return scheduler_manager.delete_run_records(job_ids=job_ids)
+
 
 scheduler_service: SchedulerService = SchedulerService()
+
+
+def _build_trigger(
+    *, trigger_type: str, trigger_config: dict[str, Any]
+) -> DateTrigger | IntervalTrigger | CronTrigger:
+    """构建调度触发器"""
+    try:
+        if trigger_type == 'date':
+            return DateTrigger(**trigger_config)
+        if trigger_type == 'interval':
+            return IntervalTrigger(**trigger_config)
+        if trigger_type == 'cron':
+            return CronTrigger(**trigger_config)
+    except (TypeError, ValueError) as exc:
+        raise errors.RequestError(msg=f'触发器参数错误: {exc}') from exc
+    raise errors.RequestError(msg='触发器类型不支持')
 
 
 def _get_run_records_select(records: list[GetSchedulerRunDetail]) -> sa.Select:

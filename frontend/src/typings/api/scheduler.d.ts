@@ -7,6 +7,12 @@ declare namespace Api {
   namespace Scheduler {
     type JobStatus = 'scheduled' | 'running' | 'paused' | 'completed' | (string & {});
 
+    type JobTriggerType = 'date' | 'interval' | 'cron';
+
+    type JobCoalesce = 'earliest' | 'latest' | 'all';
+
+    type JobConflictPolicy = 'replace' | 'do_nothing' | 'exception';
+
     type RunOutcome = 'success' | 'error' | 'missed_start_deadline' | 'cancelled' | (string & {});
 
     /** scheduler status */
@@ -45,6 +51,24 @@ declare namespace Api {
 
     /** scheduler job list */
     type JobList = Job[];
+
+    /** create scheduler job params */
+    interface CreateJobParam {
+      id?: string | null;
+      task_id: string;
+      trigger_type: JobTriggerType;
+      trigger_config: Record<string, any>;
+      args?: any[];
+      kwargs?: Record<string, any>;
+      paused?: boolean;
+      coalesce?: JobCoalesce;
+      job_executor?: string | null;
+      misfire_grace_time?: number | null;
+      max_jitter?: number | null;
+      job_result_expiration_time?: number;
+      metadata?: Record<string, any>;
+      conflict_policy?: JobConflictPolicy;
+    }
 
     /** run scheduler job result */
     interface RunJobResult {

@@ -56,7 +56,9 @@ export const useThemeStore = defineStore(SetupStoreId.Theme, () => {
   });
 
   /** Antdv Next theme */
-  const antdvTheme = computed(() => getAntdvTheme(themeColors.value, settings.value, antdvThemeOverrides.value));
+  const antdvTheme = computed(() =>
+    getAntdvTheme(themeColors.value, settings.value, darkMode.value, antdvThemeOverrides.value)
+  );
 
   /**
    * Settings json

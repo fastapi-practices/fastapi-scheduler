@@ -86,6 +86,18 @@ class SchedulerManager:
             records = [record for record in records if record.schedule_id == schedule_id]
         return records
 
+    def delete_run_records(self, *, job_ids: list[str]) -> int:
+        """
+        批量删除内存运行记录
+
+        :param job_ids: 运行任务 ID 列表
+        :return:
+        """
+        job_id_set = set(job_ids)
+        before_count = len(self._run_records)
+        self._run_records = [record for record in self._run_records if record.job_id not in job_id_set]
+        return before_count - len(self._run_records)
+
     def bind_manual_run(self, *, job_id: str, schedule_id: str) -> None:
         """绑定手动运行记录与调度任务"""
         self._running_jobs.setdefault(job_id, {'job_id': job_id})

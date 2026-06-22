@@ -1,10 +1,10 @@
 <script setup lang="tsx">
-import { ref, shallowRef } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 import { useRoute } from 'vue-router';
 import { Button, Tag } from 'antdv-next';
 import { useBoolean } from '@sa/hooks';
-import { fetchGetSchedulerRunRecordList } from '@/service/api';
-import { useAntdvPaginatedTable } from '@/hooks/common/table';
+import { fetchDeleteSchedulerRunRecords, fetchGetSchedulerRunRecordList } from '@/service/api';
+import { useAntdvPaginatedTable, useTableOperate } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import RunDetailDrawer from './modules/run-detail-drawer.vue';
 import RunSearch from './modules/run-search.vue';
@@ -55,7 +55,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       title: $t('common.index'),
       align: 'center',
       width: 64,
-      fixed: 'left',
+      fixed: 'start',
       customRender: ({ index }: { index: number }) => index + 1
     },
     {
@@ -64,7 +64,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       title: $t('page.scheduler.runs.columns.jobId'),
       align: 'center',
       width: 240,
-      fixed: 'left'
+      fixed: 'start'
     },
     {
       key: 'schedule_id',
@@ -129,7 +129,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       title: $t('common.operate'),
       align: 'center',
       width: 100,
-      fixed: 'right',
+      fixed: 'end',
       customRender: ({ record }: { record: Api.Scheduler.RunRecord }) => (
         <Button type="primary" ghost size="small" onClick={() => openDetail(record)}>
           {$t('page.scheduler.runs.detail')}
@@ -139,12 +139,39 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   ]
 });
 
+const { checkedRowKeys, onBatchDeleted } = useTableOperate(data, 'job_id', getData);
+
+const { bool: batchDeleting, setBool: setBatchDeleting } = useBoolean();
+
+const rowSelection = computed(() => ({
+  fixed: true,
+  selectedRowKeys: checkedRowKeys.value,
+  onChange: (keys: (string | number)[]) => {
+    checkedRowKeys.value = keys as string[];
+  }
+}));
+
 function getSearchParams(): Api.Scheduler.RunSearchParams {
   return {
     schedule_id: searchParams.value.schedule_id || undefined,
     page: searchParams.value.current,
     size: searchParams.value.size
   };
+}
+
+async function handleBatchDelete() {
+  setBatchDeleting(true);
+
+  const { error } = await fetchDeleteSchedulerRunRecords([...checkedRowKeys.value]);
+
+  if (!error) {
+    await onBatchDeleted();
+  } else {
+    checkedRowKeys.value = [];
+    await getData();
+  }
+
+  setBatchDeleting(false);
 }
 
 function openDetail(record: Api.Scheduler.RunRecord) {
@@ -166,13 +193,28 @@ getData();
       class="flex-col-stretch sm:flex-1-hidden card-wrapper"
     >
       <template #extra>
-        <TableHeaderOperation v-model:columns="columnChecks" :loading="loading" @refresh="getData">
-          <template #default></template>
+        <TableHeaderOperation
+          v-model:columns="columnChecks"
+          :disabled-delete="checkedRowKeys.length === 0"
+          :loading="loading"
+          @refresh="getData"
+        >
+          <template #default>
+            <APopconfirm :title="$t('common.confirmDelete')" @confirm="handleBatchDelete">
+              <AButton size="small" ghost danger :disabled="checkedRowKeys.length === 0" :loading="batchDeleting">
+                <template #icon>
+                  <icon-ic-round-delete class="text-icon" />
+                </template>
+                {{ $t('common.batchDelete') }}
+              </AButton>
+            </APopconfirm>
+          </template>
         </TableHeaderOperation>
       </template>
 
       <ATable
         row-key="job_id"
+        :row-selection="rowSelection"
         :columns="columns"
         :data-source="data"
         :loading="loading"

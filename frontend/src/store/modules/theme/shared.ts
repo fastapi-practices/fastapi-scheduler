@@ -206,9 +206,15 @@ export function toggleAuxiliaryColorModes(grayscaleMode = false, colourWeakness 
  * @param settings Theme settings object
  * @param overrides Optional manual overrides from preset
  */
-export function getAntdvTheme(colors: App.Theme.ThemeColor, settings: App.Theme.ThemeSetting, overrides?: ThemeConfig) {
+export function getAntdvTheme(
+  colors: App.Theme.ThemeColor,
+  settings: App.Theme.ThemeSetting,
+  darkMode = false,
+  overrides?: ThemeConfig
+) {
   const primaryHover = getPaletteColorByNumber(colors.primary, 500, settings.recommendColor);
   const primaryActive = getPaletteColorByNumber(colors.primary, 700, settings.recommendColor);
+  const modeColors = getThemeModeColors(settings, darkMode);
 
   const theme: ThemeConfig = {
     token: {
@@ -221,11 +227,11 @@ export function getAntdvTheme(colors: App.Theme.ThemeColor, settings: App.Theme.
       colorLink: colors.primary,
       colorLinkHover: primaryHover,
       colorLinkActive: primaryActive,
-      colorBgContainer: 'rgb(var(--container-bg-color))',
-      colorBgLayout: 'rgb(var(--layout-bg-color))',
-      colorText: 'rgb(var(--base-text-color))',
-      colorTextHeading: 'rgb(var(--base-text-color))',
-      colorSplit: 'rgb(var(--base-text-color) / 0.12)',
+      colorBgContainer: modeColors.container,
+      colorBgLayout: modeColors.layout,
+      colorText: modeColors['base-text'],
+      colorTextHeading: modeColors['base-text'],
+      colorSplit: addColorAlpha(modeColors['base-text'], 0.12),
       fontSize: NAIVE_FONT_SIZE,
       fontSizeSM: NAIVE_FONT_SIZE,
       fontSizeLG: NAIVE_FONT_SIZE_LARGE,
@@ -304,8 +310,6 @@ export function getAntdvTheme(colors: App.Theme.ThemeColor, settings: App.Theme.
         borderRadiusSM: settings.themeRadius
       },
       Table: {
-        headerBg: addColorAlpha(colors.primary, 0.04),
-        rowHoverBg: addColorAlpha(colors.primary, 0.06),
         cellFontSize: NAIVE_FONT_SIZE,
         cellFontSizeMD: NAIVE_FONT_SIZE,
         cellFontSizeSM: NAIVE_FONT_SIZE
@@ -315,6 +319,19 @@ export function getAntdvTheme(colors: App.Theme.ThemeColor, settings: App.Theme.
 
   // Preset overrides have higher priority than generated tokens
   return overrides ? defu(overrides, theme) : theme;
+}
+
+function getThemeModeColors(settings: App.Theme.ThemeSetting, darkMode = false) {
+  const { light, dark } = settings.tokens;
+
+  if (!darkMode) {
+    return light.colors;
+  }
+
+  return {
+    ...light.colors,
+    ...dark?.colors
+  };
 }
 
 function getAntdvThemeColors(colors: App.Theme.ThemeColor, recommended = false): NonNullable<ThemeConfig['token']> {

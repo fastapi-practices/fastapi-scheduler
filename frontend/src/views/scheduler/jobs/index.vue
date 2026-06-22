@@ -4,7 +4,9 @@ import { useRouter } from "vue-router";
 import { Button, Popconfirm, Tag } from "antdv-next";
 import { useBoolean } from "@sa/hooks";
 import {
+  fetchCreateSchedulerJob,
   fetchDeleteSchedulerJob,
+  fetchDeleteSchedulerJobs,
   fetchGetSchedulerJob,
   fetchGetSchedulerJobList,
   fetchPauseSchedulerJob,
@@ -14,6 +16,7 @@ import {
 import { useAntdvPaginatedTable, useTableOperate } from "@/hooks/common/table";
 import { $t } from "@/locales";
 import JobDetailDrawer from "./modules/job-detail-drawer.vue";
+import JobOperateDrawer from "./modules/job-operate-drawer.vue";
 import {
   formatBoolean,
   formatDateTime,
@@ -36,6 +39,12 @@ const paginationParams = reactive({
 
 const { bool: detailVisible, setTrue: openDetailDrawer } = useBoolean();
 const { bool: detailLoading, setBool: setDetailLoading } = useBoolean();
+const {
+  bool: operateVisible,
+  setTrue: openCreateDrawer,
+  setFalse: closeCreateDrawer,
+} = useBoolean();
+const { bool: createLoading, setBool: setCreateLoading } = useBoolean();
 
 const tableScrollX = 1760;
 
@@ -63,7 +72,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } =
         title: $t("common.index"),
         align: "center",
         width: 64,
-        fixed: "left",
+        fixed: "start",
         customRender: ({ index }: { index: number }) => index + 1,
       },
       {
@@ -72,7 +81,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } =
         title: $t("page.scheduler.jobs.columns.id"),
         align: "center",
         width: 220,
-        fixed: "left",
+        fixed: "start",
       },
       {
         key: "task_id",
@@ -142,7 +151,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } =
         title: $t("common.operate"),
         align: "center",
         width: 330,
-        fixed: "right",
+        fixed: "end",
         customRender: ({ record }: { record: Api.Scheduler.Job }) => (
           <div class="flex-center justify-end gap-8px">
             <Button
@@ -239,12 +248,9 @@ const rowSelection = computed(() => ({
 async function handleBatchDelete() {
   setBatchDeleting(true);
 
-  const ids = [...checkedRowKeys.value];
-  const results = await Promise.all(
-    ids.map((id) => fetchDeleteSchedulerJob(id)),
-  );
+  const { error } = await fetchDeleteSchedulerJobs([...checkedRowKeys.value]);
 
-  if (results.every((item) => !item.error)) {
+  if (!error) {
     await onBatchDeleted();
   } else {
     checkedRowKeys.value = [];
@@ -252,6 +258,20 @@ async function handleBatchDelete() {
   }
 
   setBatchDeleting(false);
+}
+
+async function handleCreateJob(payload: Api.Scheduler.CreateJobParam) {
+  setCreateLoading(true);
+
+  const { error } = await fetchCreateSchedulerJob(payload);
+
+  if (!error) {
+    window.$message?.success($t("common.addSuccess"));
+    closeCreateDrawer();
+    await getData();
+  }
+
+  setCreateLoading(false);
 }
 
 async function openDetail(schedule_id: string) {
@@ -333,9 +353,7 @@ getData();
 </script>
 
 <template>
-  <div
-    class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto"
-  >
+  <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
     <ACard
       :title="$t('page.scheduler.jobs.title')"
       variant="borderless"
@@ -350,29 +368,23 @@ getData();
           @refresh="getData"
         >
           <template #prefix>
-            <AButton
-              size="small"
-              @click="router.push({ name: 'scheduler_runs' })"
-            >
-              {{ $t("page.scheduler.runs.title") }}
+            <AButton size="small" @click="router.push({ name: 'scheduler_runs' })">
+              {{ $t('page.scheduler.runs.title') }}
             </AButton>
           </template>
           <template #default>
-            <APopconfirm
-              :title="$t('common.confirmDelete')"
-              @confirm="handleBatchDelete"
-            >
-              <AButton
-                size="small"
-                ghost
-                danger
-                :disabled="checkedRowKeys.length === 0"
-                :loading="batchDeleting"
-              >
+            <AButton size="small" ghost type="primary" @click="openCreateDrawer">
+              <template #icon>
+                <icon-ic-round-plus class="text-icon" />
+              </template>
+              {{ $t('common.add') }}
+            </AButton>
+            <APopconfirm :title="$t('common.confirmDelete')" @confirm="handleBatchDelete">
+              <AButton size="small" ghost danger :disabled="checkedRowKeys.length === 0" :loading="batchDeleting">
                 <template #icon>
                   <icon-ic-round-delete class="text-icon" />
                 </template>
-                {{ $t("common.batchDelete") }}
+                {{ $t('common.batchDelete') }}
               </AButton>
             </APopconfirm>
           </template>
@@ -391,11 +403,9 @@ getData();
         class="h-full"
       />
 
-      <JobDetailDrawer
-        v-model:visible="detailVisible"
-        :loading="detailLoading"
-        :row-data="detail"
-      />
+      <JobDetailDrawer v-model:visible="detailVisible" :loading="detailLoading" :row-data="detail" />
+
+      <JobOperateDrawer v-model:visible="operateVisible" :loading="createLoading" @submitted="handleCreateJob" />
     </ACard>
   </div>
 </template>

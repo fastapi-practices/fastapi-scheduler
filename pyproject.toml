@@ -15,7 +15,7 @@ dependencies = [
   "asyncpg>=0.31.0",
   "bcrypt>=5.0.0",
   # If there is a serious problem, we will try `moka-py`
-  "cachebox>=5.2.3",
+  "cachebox==5.2.3",
   "cappa>=0.31.0",
   "cryptography>=47.0.0",
   "dulwich>=1.2.5",

@@ -15,6 +15,15 @@ export function fetchGetSchedulerJob(schedule_id: string) {
   return request<Api.Scheduler.Job>({ url: `/scheduler/jobs/${schedule_id}`, method: 'get' });
 }
 
+/** create scheduler job */
+export function fetchCreateSchedulerJob(data: Api.Scheduler.CreateJobParam) {
+  return request<Api.Scheduler.Job>({
+    url: '/scheduler/jobs',
+    method: 'post',
+    data
+  });
+}
+
 /** pause scheduler job */
 export function fetchPauseSchedulerJob(schedule_id: string) {
   return request<Api.Scheduler.Job>({
@@ -47,11 +56,29 @@ export function fetchDeleteSchedulerJob(schedule_id: string) {
   });
 }
 
+/** batch delete scheduler jobs */
+export function fetchDeleteSchedulerJobs(ids: string[]) {
+  return request<unknown>({
+    url: '/scheduler/jobs',
+    method: 'delete',
+    data: { ids }
+  });
+}
+
 /** get scheduler run record list */
 export function fetchGetSchedulerRunRecordList(params?: Api.Scheduler.RunSearchParams) {
   return request<Api.Scheduler.RunRecordPage>({
     url: '/scheduler/runs',
     method: 'get',
     params
+  });
+}
+
+/** batch delete scheduler run records */
+export function fetchDeleteSchedulerRunRecords(job_ids: string[]) {
+  return request<unknown>({
+    url: '/scheduler/runs',
+    method: 'delete',
+    data: { job_ids }
   });
 }

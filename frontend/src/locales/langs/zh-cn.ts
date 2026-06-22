@@ -335,6 +335,7 @@ const local: App.I18n.Schema = {
       },
       jobs: {
         title: '调度任务',
+        addTitle: '新增调度任务',
         detailTitle: '任务详情',
         detail: '详情',
         pause: '暂停',
@@ -347,6 +348,12 @@ const local: App.I18n.Schema = {
         pauseSuccess: '暂停成功',
         resumeSuccess: '恢复成功',
         runSuccess: '已触发运行任务：{jobId}',
+        form: {
+          idPlaceholder: '不填则由 APScheduler 自动生成',
+          taskIdPlaceholder: '请输入已注册的 APScheduler 任务 ID',
+          conflictPolicy: '冲突策略',
+          jsonInvalid: '请输入合法的 JSON，并确保类型正确'
+        },
         columns: {
           id: '任务 ID',
           taskId: 'APScheduler 任务 ID',

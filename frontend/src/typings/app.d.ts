@@ -575,6 +575,7 @@ declare namespace App {
           runOutcome: Record<string, string>;
           jobs: {
             title: string;
+            addTitle: string;
             detailTitle: string;
             detail: string;
             pause: string;
@@ -587,6 +588,12 @@ declare namespace App {
             pauseSuccess: string;
             resumeSuccess: string;
             runSuccess: string;
+            form: {
+              idPlaceholder: string;
+              taskIdPlaceholder: string;
+              conflictPolicy: string;
+              jsonInvalid: string;
+            };
             columns: {
               id: string;
               taskId: string;

@@ -339,6 +339,7 @@ const local: App.I18n.Schema = {
       },
       jobs: {
         title: 'Scheduler Jobs',
+        addTitle: 'Add Scheduler Job',
         detailTitle: 'Job Detail',
         detail: 'Detail',
         pause: 'Pause',
@@ -351,6 +352,12 @@ const local: App.I18n.Schema = {
         pauseSuccess: 'Paused successfully',
         resumeSuccess: 'Resumed successfully',
         runSuccess: 'Triggered job: {jobId}',
+        form: {
+          idPlaceholder: 'Leave empty to let APScheduler generate it',
+          taskIdPlaceholder: 'Please enter a registered APScheduler task ID',
+          conflictPolicy: 'Conflict Policy',
+          jsonInvalid: 'Please enter valid JSON with the expected type'
+        },
         columns: {
           id: 'Schedule ID',
           taskId: 'APScheduler Task ID',
