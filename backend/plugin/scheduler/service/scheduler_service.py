@@ -235,9 +235,7 @@ class SchedulerService:
 scheduler_service: SchedulerService = SchedulerService()
 
 
-def _build_trigger(
-    *, trigger_type: str, trigger_config: dict[str, Any]
-) -> DateTrigger | IntervalTrigger | CronTrigger:
+def _build_trigger(*, trigger_type: str, trigger_config: dict[str, Any]) -> DateTrigger | IntervalTrigger | CronTrigger:
     """构建调度触发器"""
     try:
         if trigger_type == 'date':
