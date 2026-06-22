@@ -74,5 +74,36 @@ export const generatedRoutes: GeneratedRoute[] = [
       constant: true,
       hideInMenu: true
     }
+  },
+  {
+    name: 'scheduler',
+    path: '/scheduler',
+    component: 'layout.base',
+    meta: {
+      title: 'scheduler',
+      i18nKey: 'route.scheduler',
+      icon: 'mdi:calendar-clock',
+      order: 2
+    },
+    children: [
+      {
+        name: 'scheduler_jobs',
+        path: '/scheduler/jobs',
+        component: 'view.scheduler_jobs',
+        meta: {
+          title: 'scheduler_jobs',
+          i18nKey: 'route.scheduler_jobs'
+        }
+      },
+      {
+        name: 'scheduler_runs',
+        path: '/scheduler/runs',
+        component: 'view.scheduler_runs',
+        meta: {
+          title: 'scheduler_runs',
+          i18nKey: 'route.scheduler_runs'
+        }
+      }
+    ]
   }
 ];

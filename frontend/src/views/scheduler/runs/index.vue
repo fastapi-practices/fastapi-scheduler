@@ -1,0 +1,190 @@
+<script setup lang="tsx">
+import { ref, shallowRef } from 'vue';
+import { useRoute } from 'vue-router';
+import { Button, Tag } from 'antdv-next';
+import { useBoolean } from '@sa/hooks';
+import { fetchGetSchedulerRunRecordList } from '@/service/api';
+import { useAntdvPaginatedTable } from '@/hooks/common/table';
+import { $t } from '@/locales';
+import RunDetailDrawer from './modules/run-detail-drawer.vue';
+import RunSearch from './modules/run-search.vue';
+import {
+  formatDateTime,
+  formatDuration,
+  getRunOutcomeTagColor,
+  translateRunOutcome
+} from '../jobs/modules/shared';
+
+defineOptions({
+  name: 'SchedulerRuns'
+});
+
+const route = useRoute();
+
+const searchParams = ref<Api.Scheduler.RunSearchModel>({
+  current: 1,
+  size: 10,
+  schedule_id: typeof route.query.schedule_id === 'string' ? route.query.schedule_id : null
+});
+
+const detail = shallowRef<Api.Scheduler.RunRecord | null>(null);
+const { bool: detailVisible, setTrue: openDetailDrawer } = useBoolean();
+
+const tableScrollX = 1714;
+
+const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useAntdvPaginatedTable({
+  api: () => fetchGetSchedulerRunRecordList(getSearchParams()),
+  transform: response => {
+    const pageData = !response.error ? response.data : null;
+
+    return {
+      data: pageData?.items || [],
+      pageNum: pageData?.page || 1,
+      pageSize: pageData?.size || 10,
+      total: pageData?.total || 0
+    };
+  },
+  onPaginationParamsChange: params => {
+    searchParams.value.current = params.current || 1;
+    searchParams.value.size = params.pageSize || 10;
+  },
+  immediate: false,
+  columns: () => [
+    {
+      key: 'index',
+      title: $t('common.index'),
+      align: 'center',
+      width: 64,
+      fixed: 'left',
+      customRender: ({ index }: { index: number }) => index + 1
+    },
+    {
+      key: 'job_id',
+      dataIndex: 'job_id',
+      title: $t('page.scheduler.runs.columns.jobId'),
+      align: 'center',
+      width: 240,
+      fixed: 'left'
+    },
+    {
+      key: 'schedule_id',
+      dataIndex: 'schedule_id',
+      title: $t('page.scheduler.runs.columns.scheduleId'),
+      align: 'center',
+      width: 220
+    },
+    {
+      key: 'task_id',
+      dataIndex: 'task_id',
+      title: $t('page.scheduler.runs.columns.taskId'),
+      align: 'center',
+      width: 240
+    },
+    {
+      key: 'outcome',
+      dataIndex: 'outcome',
+      title: $t('page.scheduler.runs.columns.outcome'),
+      align: 'center',
+      width: 120,
+      customRender: ({ record }: { record: Api.Scheduler.RunRecord }) => (
+        <Tag color={getRunOutcomeTagColor(record.outcome)}>{translateRunOutcome(record.outcome)}</Tag>
+      )
+    },
+    {
+      key: 'started_at',
+      dataIndex: 'started_at',
+      title: $t('page.scheduler.runs.columns.startedAt'),
+      align: 'center',
+      width: 180,
+      customRender: ({ record }: { record: Api.Scheduler.RunRecord }) => formatDateTime(record.started_at)
+    },
+    {
+      key: 'finished_at',
+      dataIndex: 'finished_at',
+      title: $t('page.scheduler.runs.columns.finishedAt'),
+      align: 'center',
+      width: 180,
+      customRender: ({ record }: { record: Api.Scheduler.RunRecord }) => formatDateTime(record.finished_at)
+    },
+    {
+      key: 'duration_seconds',
+      dataIndex: 'duration_seconds',
+      title: $t('page.scheduler.runs.columns.durationSeconds'),
+      align: 'center',
+      width: 130,
+      customRender: ({ record }: { record: Api.Scheduler.RunRecord }) => formatDuration(record.duration_seconds)
+    },
+    {
+      key: 'exception_message',
+      dataIndex: 'exception_message',
+      title: $t('page.scheduler.runs.columns.exceptionMessage'),
+      align: 'center',
+      width: 240,
+      customRender: ({ record }: { record: Api.Scheduler.RunRecord }) => (
+        <span class={record.exception_message ? 'text-error' : ''}>{record.exception_message || '-'}</span>
+      )
+    },
+    {
+      key: 'operate',
+      title: $t('common.operate'),
+      align: 'center',
+      width: 100,
+      fixed: 'right',
+      customRender: ({ record }: { record: Api.Scheduler.RunRecord }) => (
+        <Button type="primary" ghost size="small" onClick={() => openDetail(record)}>
+          {$t('page.scheduler.runs.detail')}
+        </Button>
+      )
+    }
+  ]
+});
+
+function getSearchParams(): Api.Scheduler.RunSearchParams {
+  return {
+    schedule_id: searchParams.value.schedule_id || undefined,
+    page: searchParams.value.current,
+    size: searchParams.value.size
+  };
+}
+
+function openDetail(record: Api.Scheduler.RunRecord) {
+  detail.value = record;
+  openDetailDrawer();
+}
+
+getData();
+</script>
+
+<template>
+  <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
+    <RunSearch v-model:model="searchParams" @search="getDataByPage" />
+
+    <ACard
+      :title="$t('page.scheduler.runs.title')"
+      variant="borderless"
+      :body-style="{ flex: 1, overflow: 'hidden' }"
+      class="flex-col-stretch sm:flex-1-hidden card-wrapper"
+    >
+      <template #extra>
+        <TableHeaderOperation v-model:columns="columnChecks" :loading="loading" @refresh="getData">
+          <template #default></template>
+        </TableHeaderOperation>
+      </template>
+
+      <ATable
+        row-key="job_id"
+        :columns="columns"
+        :data-source="data"
+        :loading="loading"
+        :scroll="{ x: tableScrollX }"
+        :pagination="mobilePagination"
+        size="small"
+        class="h-full"
+      />
+
+      <RunDetailDrawer v-model:visible="detailVisible" :row-data="detail" />
+    </ACard>
+  </div>
+</template>
+
+<style scoped></style>

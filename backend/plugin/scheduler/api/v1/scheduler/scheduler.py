@@ -2,8 +2,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Path, Query
 
+from backend.common.pagination import DependsPagination, PageData
 from backend.common.response.response_schema import ResponseModel, ResponseSchemaModel, response_base
 from backend.common.security.jwt import DependsJwtAuth
+from backend.database.db import CurrentSession
 from backend.plugin.scheduler.schema.scheduler import (
     GetSchedulerJobDetail,
     GetSchedulerRunDetail,
@@ -67,10 +69,17 @@ async def delete_scheduler_job(
     return response_base.success()
 
 
-@router.get('/runs', summary='获取调度运行记录', dependencies=[DependsJwtAuth])
-async def get_all_scheduler_runs(
+@router.get(
+    '/runs',
+    summary='分页获取所有调度运行记录',
+    dependencies=[
+        DependsJwtAuth,
+        DependsPagination,
+    ],
+)
+async def get_scheduler_runs_paginated(
+    db: CurrentSession,
     schedule_id: Annotated[str | None, Query(description='任务 ID')] = None,
-    limit: Annotated[int, Query(ge=1, le=200, description='返回数量')] = 100,
-) -> ResponseSchemaModel[list[GetSchedulerRunDetail]]:
-    data = scheduler_service.get_runs(schedule_id=schedule_id, limit=limit)
-    return response_base.success(data=data)
+) -> ResponseSchemaModel[PageData[GetSchedulerRunDetail]]:
+    page_data = await scheduler_service.get_list(db=db, schedule_id=schedule_id)
+    return response_base.success(data=page_data)

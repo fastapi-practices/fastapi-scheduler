@@ -26,6 +26,8 @@ const local: App.I18n.Schema = {
     edit: '编辑',
     warning: '警告',
     error: '错误',
+    expand: '展开',
+    collapse: '收起',
     index: '序号',
     keywordSearch: '请输入关键词搜索',
     logout: '退出登录',
@@ -225,7 +227,10 @@ const local: App.I18n.Schema = {
     404: '页面不存在',
     500: '服务器错误',
     'iframe-page': '外链页面',
-    home: '首页'
+    home: '首页',
+    scheduler: '调度器',
+    scheduler_jobs: '调度任务',
+    scheduler_runs: '运行记录'
   },
   page: {
     login: {
@@ -300,6 +305,92 @@ const local: App.I18n.Schema = {
         desc5: 'Soybean 刚才把工作台页面随便写了一些，凑合能看了！'
       },
       creativity: '创意'
+    },
+    scheduler: {
+      common: {
+        enabled: '已启用',
+        disabled: '已禁用',
+        started: '已启动',
+        stopped: '未启动'
+      },
+      status: {
+        enabled: '调度器开关',
+        started: '运行状态',
+        scheduleCount: '任务数量',
+        runningJobCount: '运行中任务',
+        identity: '调度器标识',
+        timezone: '时区'
+      },
+      jobStatus: {
+        scheduled: '已计划',
+        running: '运行中',
+        paused: '已暂停',
+        completed: '已完成'
+      },
+      runOutcome: {
+        success: '成功',
+        error: '失败',
+        missed_start_deadline: '错过开始时间',
+        cancelled: '已取消'
+      },
+      jobs: {
+        title: '调度任务',
+        detailTitle: '任务详情',
+        detail: '详情',
+        pause: '暂停',
+        resume: '恢复',
+        run: '立即运行',
+        runs: '运行记录',
+        confirmPause: '确认暂停该调度任务吗？',
+        confirmResume: '确认恢复该调度任务吗？',
+        confirmRun: '确认立即运行该调度任务吗？',
+        pauseSuccess: '暂停成功',
+        resumeSuccess: '恢复成功',
+        runSuccess: '已触发运行任务：{jobId}',
+        columns: {
+          id: '任务 ID',
+          taskId: 'APScheduler 任务 ID',
+          status: '状态',
+          paused: '已暂停',
+          triggerType: '触发器类型',
+          trigger: '触发器',
+          triggerConfig: '触发器配置',
+          nextFireTime: '下次运行时间',
+          lastFireTime: '最近运行时间',
+          runningJobCount: '运行中数量',
+          coalesce: '合并策略',
+          misfireGraceTime: '错过触发宽限',
+          maxJitter: '最大随机抖动',
+          jobExecutor: '执行器',
+          jobResultExpirationTime: '任务结果保留',
+          acquiredBy: '当前获取调度器',
+          acquiredUntil: '获取锁截止时间',
+          args: '位置参数',
+          kwargs: '关键字参数',
+          metadata: '元数据'
+        }
+      },
+      runs: {
+        title: '运行记录',
+        detailTitle: '运行详情',
+        detail: '详情',
+        limit: '返回数量',
+        scheduleIdPlaceholder: '请输入任务 ID',
+        columns: {
+          jobId: '运行任务 ID',
+          scheduleId: '任务 ID',
+          taskId: 'APScheduler 任务 ID',
+          schedulerId: '执行调度器 ID',
+          outcome: '运行结果',
+          scheduledStart: '计划开始时间',
+          startedAt: '实际开始时间',
+          finishedAt: '结束时间',
+          durationSeconds: '运行耗时',
+          exceptionType: '异常类型',
+          exceptionMessage: '异常信息',
+          exceptionTraceback: '异常堆栈'
+        }
+      }
     }
   },
   form: {

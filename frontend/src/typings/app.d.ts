@@ -338,6 +338,8 @@ declare namespace App {
         edit: string;
         warning: string;
         error: string;
+        expand: string;
+        collapse: string;
         index: string;
         keywordSearch: string;
         logout: string;
@@ -553,6 +555,82 @@ declare namespace App {
             desc5: string;
           };
           creativity: string;
+        };
+        scheduler: {
+          common: {
+            enabled: string;
+            disabled: string;
+            started: string;
+            stopped: string;
+          };
+          status: {
+            enabled: string;
+            started: string;
+            scheduleCount: string;
+            runningJobCount: string;
+            identity: string;
+            timezone: string;
+          };
+          jobStatus: Record<string, string>;
+          runOutcome: Record<string, string>;
+          jobs: {
+            title: string;
+            detailTitle: string;
+            detail: string;
+            pause: string;
+            resume: string;
+            run: string;
+            runs: string;
+            confirmPause: string;
+            confirmResume: string;
+            confirmRun: string;
+            pauseSuccess: string;
+            resumeSuccess: string;
+            runSuccess: string;
+            columns: {
+              id: string;
+              taskId: string;
+              status: string;
+              paused: string;
+              triggerType: string;
+              trigger: string;
+              triggerConfig: string;
+              nextFireTime: string;
+              lastFireTime: string;
+              runningJobCount: string;
+              coalesce: string;
+              misfireGraceTime: string;
+              maxJitter: string;
+              jobExecutor: string;
+              jobResultExpirationTime: string;
+              acquiredBy: string;
+              acquiredUntil: string;
+              args: string;
+              kwargs: string;
+              metadata: string;
+            };
+          };
+          runs: {
+            title: string;
+            detailTitle: string;
+            detail: string;
+            limit: string;
+            scheduleIdPlaceholder: string;
+            columns: {
+              jobId: string;
+              scheduleId: string;
+              taskId: string;
+              schedulerId: string;
+              outcome: string;
+              scheduledStart: string;
+              startedAt: string;
+              finishedAt: string;
+              durationSeconds: string;
+              exceptionType: string;
+              exceptionMessage: string;
+              exceptionTraceback: string;
+            };
+          };
         };
       };
       form: {

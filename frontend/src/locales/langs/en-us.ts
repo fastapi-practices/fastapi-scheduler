@@ -26,6 +26,8 @@ const local: App.I18n.Schema = {
     edit: 'Edit',
     warning: 'Warning',
     error: 'Error',
+    expand: 'Expand',
+    collapse: 'Collapse',
     index: 'Index',
     keywordSearch: 'Please enter keyword',
     logout: 'Logout',
@@ -229,7 +231,10 @@ const local: App.I18n.Schema = {
     404: 'Page Not Found',
     500: 'Server Error',
     'iframe-page': 'Iframe',
-    home: 'Home'
+    home: 'Home',
+    scheduler: 'Scheduler',
+    scheduler_jobs: 'Scheduler Jobs',
+    scheduler_runs: 'Run Records'
   },
   page: {
     login: {
@@ -304,6 +309,92 @@ const local: App.I18n.Schema = {
         desc5: 'Soybean just wrote some of the workbench pages casually, and it was enough to see!'
       },
       creativity: 'Creativity'
+    },
+    scheduler: {
+      common: {
+        enabled: 'Enabled',
+        disabled: 'Disabled',
+        started: 'Started',
+        stopped: 'Stopped'
+      },
+      status: {
+        enabled: 'Scheduler Switch',
+        started: 'Running Status',
+        scheduleCount: 'Schedule Count',
+        runningJobCount: 'Running Jobs',
+        identity: 'Scheduler Identity',
+        timezone: 'Timezone'
+      },
+      jobStatus: {
+        scheduled: 'Scheduled',
+        running: 'Running',
+        paused: 'Paused',
+        completed: 'Completed'
+      },
+      runOutcome: {
+        success: 'Success',
+        error: 'Failed',
+        missed_start_deadline: 'Missed Start Deadline',
+        cancelled: 'Cancelled'
+      },
+      jobs: {
+        title: 'Scheduler Jobs',
+        detailTitle: 'Job Detail',
+        detail: 'Detail',
+        pause: 'Pause',
+        resume: 'Resume',
+        run: 'Run Now',
+        runs: 'Run Records',
+        confirmPause: 'Are you sure you want to pause this scheduler job?',
+        confirmResume: 'Are you sure you want to resume this scheduler job?',
+        confirmRun: 'Are you sure you want to run this scheduler job now?',
+        pauseSuccess: 'Paused successfully',
+        resumeSuccess: 'Resumed successfully',
+        runSuccess: 'Triggered job: {jobId}',
+        columns: {
+          id: 'Schedule ID',
+          taskId: 'APScheduler Task ID',
+          status: 'Status',
+          paused: 'Paused',
+          triggerType: 'Trigger Type',
+          trigger: 'Trigger',
+          triggerConfig: 'Trigger Config',
+          nextFireTime: 'Next Fire Time',
+          lastFireTime: 'Last Fire Time',
+          runningJobCount: 'Running Count',
+          coalesce: 'Coalesce',
+          misfireGraceTime: 'Misfire Grace Time',
+          maxJitter: 'Max Jitter',
+          jobExecutor: 'Job Executor',
+          jobResultExpirationTime: 'Result Expiration Time',
+          acquiredBy: 'Acquired By',
+          acquiredUntil: 'Acquired Until',
+          args: 'Args',
+          kwargs: 'Kwargs',
+          metadata: 'Metadata'
+        }
+      },
+      runs: {
+        title: 'Run Records',
+        detailTitle: 'Run Detail',
+        detail: 'Detail',
+        limit: 'Limit',
+        scheduleIdPlaceholder: 'Please enter schedule ID',
+        columns: {
+          jobId: 'Job ID',
+          scheduleId: 'Schedule ID',
+          taskId: 'APScheduler Task ID',
+          schedulerId: 'Scheduler ID',
+          outcome: 'Outcome',
+          scheduledStart: 'Scheduled Start',
+          startedAt: 'Started At',
+          finishedAt: 'Finished At',
+          durationSeconds: 'Duration',
+          exceptionType: 'Exception Type',
+          exceptionMessage: 'Exception Message',
+          exceptionTraceback: 'Exception Traceback'
+        }
+      }
     }
   },
   form: {

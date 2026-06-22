@@ -1,14 +1,19 @@
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any
 from uuid import UUID
 
+import sqlalchemy as sa
+
 from apscheduler import AsyncScheduler, Job, Schedule, ScheduleLookupError
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.common.exception import errors
+from backend.common.pagination import paging_data
 from backend.core.conf import settings
 from backend.plugin.scheduler.schema.scheduler import (
     GetSchedulerJobDetail,
@@ -19,6 +24,21 @@ from backend.plugin.scheduler.schema.scheduler import (
 from backend.plugin.scheduler.utils.scheduler import get_scheduler as _get_scheduler
 from backend.plugin.scheduler.utils.scheduler import scheduler_manager
 from backend.utils.timezone import timezone
+
+_RUN_RECORD_FIELDS = (
+    'job_id',
+    'schedule_id',
+    'task_id',
+    'scheduler_id',
+    'scheduled_start',
+    'started_at',
+    'finished_at',
+    'duration_seconds',
+    'outcome',
+    'exception_type',
+    'exception_message',
+    'exception_traceback',
+)
 
 
 def get_scheduler() -> AsyncScheduler:
@@ -128,18 +148,47 @@ class SchedulerService:
         await scheduler_manager.scheduler.remove_schedule(schedule_id)
 
     @staticmethod
-    def get_runs(*, schedule_id: str | None = None, limit: int = 100) -> list[GetSchedulerRunDetail]:
+    async def get_list(*, db: AsyncSession, schedule_id: str | None = None) -> dict[str, Any]:
         """
         获取调度任务运行记录
 
+        :param db: 数据库会话
         :param schedule_id: 任务 ID
-        :param limit: 返回数量
         :return:
         """
-        return scheduler_manager.get_run_records(schedule_id=schedule_id, limit=limit)
+        records = scheduler_manager.get_run_records(schedule_id=schedule_id)
+        run_record_select = _get_run_records_select(records)
+        return await paging_data(db, run_record_select, transformer=_serialize_run_record_rows)
 
 
 scheduler_service: SchedulerService = SchedulerService()
+
+
+def _get_run_records_select(records: list[GetSchedulerRunDetail]) -> sa.Select:
+    """获取调度运行记录分页查询表达式"""
+    if not records:
+        columns = [sa.literal(None).label(field) for field in _RUN_RECORD_FIELDS]
+        return sa.select(*columns).where(sa.false())
+    selects = []
+    for index, record in enumerate(records):
+        record_data = record.model_dump(mode='json')
+        columns = [sa.literal(index).label('_sort_order')]
+        for field in _RUN_RECORD_FIELDS:
+            value = record_data[field]
+            if field == 'exception_traceback':
+                column = sa.literal(value, type_=sa.JSON).label(field)
+            else:
+                column = sa.literal(value).label(field)
+            columns.append(column)
+        selects.append(sa.select(*columns))
+    run_records = sa.union_all(*selects).subquery()
+    columns = [getattr(run_records.c, field) for field in _RUN_RECORD_FIELDS]
+    return sa.select(*columns).order_by(run_records.c._sort_order)
+
+
+def _serialize_run_record_rows(items: Sequence[Any]) -> list[dict[str, Any]]:
+    """序列化调度运行记录分页行"""
+    return [dict(item._mapping) for item in items]
 
 
 async def _get_schedule(*, schedule_id: str) -> Schedule:

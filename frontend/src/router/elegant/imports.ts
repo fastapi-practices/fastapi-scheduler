@@ -21,4 +21,6 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   "iframe-page": () => import("@/views/_builtin/iframe-page/[url].vue"),
   login: () => import("@/views/_builtin/login/index.vue"),
   home: () => import("@/views/home/index.vue"),
+  scheduler_jobs: () => import("@/views/scheduler/jobs/index.vue"),
+  scheduler_runs: () => import("@/views/scheduler/runs/index.vue"),
 };

@@ -79,12 +79,12 @@ class SchedulerManager:
         elif isinstance(event, JobReleased):
             self._append_run_record(event)
 
-    def get_run_records(self, *, schedule_id: str | None = None, limit: int = 100) -> list[GetSchedulerRunDetail]:
+    def get_run_records(self, *, schedule_id: str | None = None) -> list[GetSchedulerRunDetail]:
         """获取内存运行记录"""
         records = self._run_records
         if schedule_id:
             records = [record for record in records if record.schedule_id == schedule_id]
-        return records[:limit]
+        return records
 
     def bind_manual_run(self, *, job_id: str, schedule_id: str) -> None:
         """绑定手动运行记录与调度任务"""
