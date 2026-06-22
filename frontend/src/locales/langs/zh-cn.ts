@@ -350,7 +350,7 @@ const local: App.I18n.Schema = {
         runSuccess: '已触发运行任务：{jobId}',
         form: {
           idPlaceholder: '不填则由 APScheduler 自动生成',
-          taskIdPlaceholder: '请输入已注册的 APScheduler 任务 ID',
+          taskIdPlaceholder: '请输入已注册的 APScheduler 任务 ID 或可导入函数引用',
           conflictPolicy: '冲突策略',
           jsonInvalid: '请输入合法的 JSON，并确保类型正确'
         },

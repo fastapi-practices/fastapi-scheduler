@@ -46,7 +46,7 @@ const {
 } = useBoolean();
 const { bool: createLoading, setBool: setCreateLoading } = useBoolean();
 
-const tableScrollX = 1760;
+const tableScrollX = 1790;
 
 const { columns, columnChecks, data, getData, loading, mobilePagination } =
   useAntdvPaginatedTable({
@@ -73,7 +73,8 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } =
         align: "center",
         width: 64,
         fixed: "start",
-        customRender: ({ index }: { index: number }) => index + 1,
+        render: (_value: unknown, _record: Api.Scheduler.Job, index: number) =>
+          index + 1,
       },
       {
         key: "id",
@@ -96,7 +97,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } =
         title: $t("page.scheduler.jobs.columns.status"),
         align: "center",
         width: 120,
-        customRender: ({ record }: { record: Api.Scheduler.Job }) => (
+        render: (_value: unknown, record: Api.Scheduler.Job) => (
           <Tag color={getJobStatusTagColor(record.status)}>
             {translateJobStatus(record.status)}
           </Tag>
@@ -108,7 +109,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } =
         title: $t("page.scheduler.jobs.columns.paused"),
         align: "center",
         width: 100,
-        customRender: ({ record }: { record: Api.Scheduler.Job }) => (
+        render: (_value: unknown, record: Api.Scheduler.Job) => (
           <Tag color={record.paused ? "warning" : "success"}>
             {formatBoolean(record.paused)}
           </Tag>
@@ -127,7 +128,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } =
         title: $t("page.scheduler.jobs.columns.nextFireTime"),
         align: "center",
         width: 180,
-        customRender: ({ record }: { record: Api.Scheduler.Job }) =>
+        render: (_value: unknown, record: Api.Scheduler.Job) =>
           formatDateTime(record.next_fire_time),
       },
       {
@@ -136,7 +137,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } =
         title: $t("page.scheduler.jobs.columns.lastFireTime"),
         align: "center",
         width: 180,
-        customRender: ({ record }: { record: Api.Scheduler.Job }) =>
+        render: (_value: unknown, record: Api.Scheduler.Job) =>
           formatDateTime(record.last_fire_time),
       },
       {
@@ -150,10 +151,10 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } =
         key: "operate",
         title: $t("common.operate"),
         align: "center",
-        width: 330,
+        width: 360,
         fixed: "end",
-        customRender: ({ record }: { record: Api.Scheduler.Job }) => (
-          <div class="flex-center justify-end gap-8px">
+        render: (_value: unknown, record: Api.Scheduler.Job) => (
+          <div class="flex-center justify-end gap-6px">
             <Button
               type="primary"
               ghost
@@ -171,7 +172,6 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } =
               onConfirm={() => handleTogglePause(record)}
             >
               <Button
-                ghost
                 size="small"
                 loading={getOperationLoading(
                   record.paused ? "resume" : "pause",
@@ -188,14 +188,13 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } =
               onConfirm={() => handleRun(record)}
             >
               <Button
-                ghost
                 size="small"
                 loading={getOperationLoading("run", record.id)}
               >
                 {$t("page.scheduler.jobs.run")}
               </Button>
             </Popconfirm>
-            <Button ghost size="small" onClick={() => openRuns(record)}>
+            <Button size="small" onClick={() => openRuns(record)}>
               {$t("page.scheduler.jobs.runs")}
             </Button>
             <Popconfirm
@@ -367,11 +366,6 @@ getData();
           :loading="loading"
           @refresh="getData"
         >
-          <template #prefix>
-            <AButton size="small" @click="router.push({ name: 'scheduler_runs' })">
-              {{ $t('page.scheduler.runs.title') }}
-            </AButton>
-          </template>
           <template #default>
             <AButton size="small" ghost type="primary" @click="openCreateDrawer">
               <template #icon>

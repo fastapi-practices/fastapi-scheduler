@@ -61,21 +61,22 @@ class SchedulerManager:
     def record_event(self, event: Event) -> None:
         """记录调度运行事件"""
         if isinstance(event, JobAdded):
-            self._running_jobs[str(event.job_id)] = {
-                'job_id': str(event.job_id),
-                'task_id': event.task_id,
-                'schedule_id': event.schedule_id,
-            }
+            job_id = str(event.job_id)
+            running = self._running_jobs.setdefault(job_id, {'job_id': job_id})
+            running['task_id'] = event.task_id
+            if event.schedule_id is not None or 'schedule_id' not in running:
+                running['schedule_id'] = event.schedule_id
         elif isinstance(event, JobAcquired):
             job_id = str(event.job_id)
             self._running_jobs.setdefault(job_id, {'job_id': job_id})
             self._running_jobs[job_id].update({
                 'scheduler_id': event.scheduler_id,
                 'task_id': event.task_id,
-                'schedule_id': event.schedule_id,
                 'scheduled_start': event.scheduled_start,
                 'started_at': event.timestamp,
             })
+            if event.schedule_id is not None or 'schedule_id' not in self._running_jobs[job_id]:
+                self._running_jobs[job_id]['schedule_id'] = event.schedule_id
         elif isinstance(event, JobReleased):
             self._append_run_record(event)
 

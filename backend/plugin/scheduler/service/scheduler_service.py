@@ -1,6 +1,7 @@
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from datetime import datetime, timedelta
 from enum import Enum
+from importlib import import_module
 from typing import Any
 from uuid import UUID
 
@@ -8,6 +9,7 @@ import sqlalchemy as sa
 
 from apscheduler import (
     AsyncScheduler,
+    CallableLookupError,
     CoalescePolicy,
     ConflictPolicy,
     ConflictingIdError,
@@ -110,6 +112,7 @@ class SchedulerService:
         :return:
         """
         _ensure_scheduler_operable()
+        task = await _get_schedule_task(task_id=obj.task_id)
         trigger = _build_trigger(trigger_type=obj.trigger_type, trigger_config=obj.trigger_config)
         add_schedule_kwargs: dict[str, Any] = {
             'id': obj.id,
@@ -128,7 +131,7 @@ class SchedulerService:
         if obj.metadata:
             add_schedule_kwargs['metadata'] = obj.metadata
         try:
-            schedule_id = await scheduler_manager.scheduler.add_schedule(obj.task_id, trigger, **add_schedule_kwargs)
+            schedule_id = await scheduler_manager.scheduler.add_schedule(task, trigger, **add_schedule_kwargs)
         except ConflictingIdError as exc:
             raise errors.ConflictError(msg='调度任务已存在') from exc
         except TaskLookupError as exc:
@@ -281,6 +284,35 @@ async def _get_schedule(*, schedule_id: str) -> Schedule:
         return await scheduler_manager.scheduler.get_schedule(schedule_id)
     except ScheduleLookupError as exc:
         raise errors.NotFoundError(msg='调度任务不存在') from exc
+
+
+async def _get_schedule_task(*, task_id: str) -> str | Callable[..., Any]:
+    try:
+        task = await scheduler_manager.scheduler.data_store.get_task(task_id)
+    except TaskLookupError:
+        return _load_callable_from_ref(ref=task_id)
+    try:
+        scheduler_manager.scheduler._get_task_callable(task)
+    except (CallableLookupError, LookupError, ValueError) as exc:
+        raise errors.RequestError(msg='APScheduler 任务未绑定可执行函数') from exc
+    return task_id
+
+
+def _load_callable_from_ref(*, ref: str) -> Callable[..., Any]:
+    if ':' not in ref:
+        raise errors.NotFoundError(msg='APScheduler 任务不存在')
+    module_name, attr_path = ref.split(':', 1)
+    if not module_name or not attr_path:
+        raise errors.NotFoundError(msg='APScheduler 任务不存在')
+    try:
+        target: Any = import_module(module_name)
+        for attr in attr_path.split('.'):
+            target = getattr(target, attr)
+    except (ImportError, AttributeError) as exc:
+        raise errors.NotFoundError(msg='APScheduler 任务不存在') from exc
+    if not callable(target):
+        raise errors.RequestError(msg='APScheduler 任务不是可调用对象')
+    return target
 
 
 def _ensure_scheduler_operable() -> None:

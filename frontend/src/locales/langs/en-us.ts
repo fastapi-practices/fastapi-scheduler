@@ -354,7 +354,7 @@ const local: App.I18n.Schema = {
         runSuccess: 'Triggered job: {jobId}',
         form: {
           idPlaceholder: 'Leave empty to let APScheduler generate it',
-          taskIdPlaceholder: 'Please enter a registered APScheduler task ID',
+          taskIdPlaceholder: 'Enter a registered APScheduler task ID or importable callable reference',
           conflictPolicy: 'Conflict Policy',
           jsonInvalid: 'Please enter valid JSON with the expected type'
         },

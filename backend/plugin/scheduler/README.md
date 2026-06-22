@@ -30,6 +30,7 @@ SCHEDULER_IDENTITY: str = 'fastapi-scheduler'
 ## 使用方式
 
 1. 在业务代码中获取插件提供的 APScheduler 调度器实例并注册任务
+2. 新增调度任务时填写已注册任务 ID，或填写可导入函数引用，例如 `backend.plugin.scheduler.utils.tasks:scheduler_noop`
 
 ## 卸载说明
 

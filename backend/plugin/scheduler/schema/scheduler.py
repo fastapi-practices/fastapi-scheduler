@@ -25,7 +25,7 @@ class SchedulerJobSchemaBase(SchemaBase):
     """调度任务基础模型"""
 
     id: str = Field(description='任务 ID')
-    task_id: str = Field(description='APScheduler 任务 ID', min_length=1)
+    task_id: str = Field(description='APScheduler 任务 ID 或可导入函数引用', min_length=1)
     trigger: str = Field(description='触发器描述')
     trigger_type: str = Field(description='触发器类型')
     trigger_config: dict[str, Any] = Field(description='触发器配置')
@@ -54,7 +54,7 @@ class CreateSchedulerJobParam(SchemaBase):
     """创建调度任务参数"""
 
     id: str | None = Field(None, description='任务 ID')
-    task_id: str = Field(description='APScheduler 任务 ID', min_length=1)
+    task_id: str = Field(description='APScheduler 任务 ID 或可导入函数引用', min_length=1)
     trigger_type: Literal['date', 'interval', 'cron'] = Field(description='触发器类型')
     trigger_config: dict[str, Any] = Field(description='触发器配置')
     args: list[Any] = Field(default_factory=list, description='位置参数')
